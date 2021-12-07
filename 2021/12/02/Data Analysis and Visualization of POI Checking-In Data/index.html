@@ -542,7 +542,7 @@
 </ol>
 </blockquote>
 <p>也就是说要实现三个功能，要能从磁盘中提取csv文件读数据，然后通过交互方框获取用户的输入值，最后通过输入值和数据作出x-y 折线图。</p>
-<p>在做小作业之前我苦苦思索，花了一天时间阅读 <a target="_blank" rel="noopener" href="https://www.devbean.net/2012/08/qt-study-road-2-catelog/">Qt学习之路</a>，除了了解一些函数和类的基本功能外（这是当时边学边复制粘贴来的[笔记]([Qt GUI Programming Notes | MING’s blog (yevzwming.github.io)](<a href="https://yevzwming.github.io/2021/12/01/Qt">https://yevzwming.github.io/2021/12/01/Qt</a> GUI Programming Notes/))），并没有学会怎么去运用这些去实际解决问题。上最后一次问求课的时候，同学提醒我面向CSDN编程，我恍然大悟，开始直接着手捣鼓这个小作业。</p>
+<p>在做小作业之前我苦苦思索，花了一天时间阅读 <a target="_blank" rel="noopener" href="https://www.devbean.net/2012/08/qt-study-road-2-catelog/">Qt学习之路</a>，除了了解一些函数和类的基本功能外（这是当时边学边复制粘贴来的<a href="https://yevzwming.github.io/2021/12/01/Qt%20GUI%20Programming%20Notes/">笔记</a>，并没有学会怎么去运用这些去实际解决问题。上最后一次问求课的时候，同学提醒我面向CSDN编程，我恍然大悟，开始直接着手捣鼓这个小作业。</p>
 <p>我觉得画图比较简单，于是先从第三部分做起，上CSDN搜索发现一个宝贝类：<code>QLineSeries</code>。我选择了一些基本功能的代码加入我的程序：</p>
 <p>(先修改pro文件并添加名称空间)</p>
 <pre class="line-numbers language-c++" data-language="c++"><code class="language-c++"> &#x2F;&#x2F;设置line和point
