@@ -542,7 +542,7 @@
 </ol>
 </blockquote>
 <p>也就是说要实现三个功能，要能从磁盘中提取csv文件读数据，然后通过交互方框获取用户的输入值，最后通过输入值和数据作出x-y 折线图。</p>
-<p>在做小作业之前我苦苦思索，花了一天时间阅读 <a target="_blank" rel="noopener" href="https://www.devbean.net/2012/08/qt-study-road-2-catelog/">Qt学习之路</a>，除了了解一些函数和类的基本功能外（这是当时边学边复制粘贴来的<a href="https://yevzwming.github.io/2021/12/01/Qt%20GUI%20Programming%20Notes/">笔记</a>，并没有学会怎么去运用这些去实际解决问题。上最后一次问求课的时候，同学提醒我面向CSDN编程，我恍然大悟，开始直接着手捣鼓这个小作业。</p>
+<h3><span id="version-10">Version 1.0</span></h3><p>在做小作业之前我苦苦思索，花了一天时间阅读 <a target="_blank" rel="noopener" href="https://www.devbean.net/2012/08/qt-study-road-2-catelog/">Qt学习之路</a>，除了了解一些函数和类的基本功能外（这是当时边学边复制粘贴来的<a href="https://yevzwming.github.io/2021/12/01/Qt%20GUI%20Programming%20Notes/">笔记</a>，并没有学会怎么去运用这些去实际解决问题。上最后一次问求课的时候，同学提醒我面向CSDN编程，我恍然大悟，开始直接着手捣鼓这个小作业。</p>
 <p>我觉得画图比较简单，于是先从第三部分做起，上CSDN搜索发现一个宝贝类：<code>QLineSeries</code>。我选择了一些基本功能的代码加入我的程序：</p>
 <p>(先修改pro文件并添加名称空间)</p>
 <pre class="line-numbers language-c++" data-language="c++"><code class="language-c++"> &#x2F;&#x2F;设置line和point
@@ -671,42 +671,143 @@ int main(int argc, char *argv[])
     return a.exec();
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+<h3><span id="version-20">Version 2.0</span></h3><p>但是，我转念一想，第二个要求上课的时候小姐姐讲了很长时间如何自己设计构件，我觉得这样直接用<code>QInputDialog</code>太不负责任了，于是我打算推倒重建，结合上课所讲的知识来完成任务。</p>
+<p>首先我打算把代码全部从<code>main</code>里面撤销，也不用<code>mainwindow</code>,而是自己定义一个<code>widget</code>来实现功能,我一开始其实只是想用widget来实现自定义输入的box，后来发现这样的话在不同文件间传输数据很麻烦，且不能满足各个功能的时序性。</p>
+<p>我在将box的样式构建好之后，应该如何触发画图呢？思来想去发现应该在<code>main</code>函数里调用<code>QObject::connect</code>函数，但是直接调用会报错，为什么呢? 发现这里的<code>button</code>是在<code>widget</code>函数里调用的，而不是<code>widget</code>类，所以我们要把里面的一些小构建写在<code>widget.h</code>头文件的类里。</p>
+<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">QLabel*label&#x3D;new QLabel(&quot;Please input the beginning week:&quot;);
+QLabel*labelbel&#x3D;new QLabel(&quot;Please input the ending week:&quot;);
+spinbox&#x3D;new QSpinBox(this);
+spinboxbox&#x3D;new QSpinBox(this);
+QSlider*slider&#x3D;new QSlider(Qt::Horizontal,this);
+QSlider*sliderder&#x3D;new QSlider(Qt::Horizontal,this);
+spinbox-&gt;setRange(1,52);
+spinboxbox-&gt;setRange(1,52);
+slider-&gt;setRange(1,52);
+sliderder-&gt;setRange(1,52);
+QObject::connect(slider,&amp;QSlider::valueChanged,spinbox,&amp;QSpinBox::setValue);
+void (QSpinBox:: *spinBoxSignal)(int)&#x3D;&amp;QSpinBox::valueChanged;
+QObject::connect(spinbox,spinBoxSignal,slider,&amp;QSlider::setValue);
+QObject::connect(sliderder,&amp;QSlider::valueChanged,spinboxbox,&amp;QSpinBox::setValue);
+QObject::connect(spinboxbox,spinBoxSignal,sliderder,&amp;QSlider::setValue);
+QVBoxLayout*layout&#x3D;new QVBoxLayout;
+btn&#x3D;new QPushButton(&quot;I have entered the value!&quot;);
+layout-&gt;addWidget(label);
+layout-&gt;addWidget(spinbox);
+layout-&gt;addWidget(slider);
+layout-&gt;addWidget(labelbel);
+layout-&gt;addWidget(spinboxbox);
+layout-&gt;addWidget(sliderder);
+layout-&gt;addWidget(btn);
+this-&gt;setLayout(layout);
+this-&gt;show();<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+<p>而在<code>main</code>函数里，我们如此调用：</p>
+<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">int main(int argc, char *argv[])
+&#123;
+    QApplication a(argc, argv);
+    widget w;
+    QObject::connect(w.btn,&amp;QPushButton::clicked,&amp;w,&amp;widget::showline);
+    QObject::connect(w.btn,&amp;QPushButton::clicked,&amp;w,&amp;widget::close);
+    return a.exec();
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+<p>也就是在外层操控，一旦按钮被点开，直接用<code>main</code>函数来关闭窗口并运行画图函数<code>widget::showline()</code>。我们也只能无奈地把<code>showline</code>写在<code>widget</code>里了。</p>
+<p>其他的部分改动不大，我们把数组也写进了类的头文件里，把读取文件的代码块直接移植到``widget`里，于是我们改进版大功告成。(改bug改了五个小时一直到ddl前半小时才提交……)</p>
+<p>最后放一下最终的<code>widget.cpp</code>代码：</p>
+<pre class="line-numbers language-C++" data-language="C++"><code class="language-C++">#include &quot;mainwindow.h&quot;
+#include &quot;widget.h&quot;
+#include &lt;QApplication&gt;
+#include&lt;QStringList&gt;
+#include&lt;QTextStream&gt;
+#include&lt;QtDebug&gt;
+#include&lt;QChart&gt;
+#include&lt;QSlider&gt;
+#include&lt;QSpinBox&gt;
+#include&lt;QHBoxLayout&gt;
+#include&lt;QWidget&gt;
+#include&lt;QLabel&gt;
+#include&lt;QWidget&gt;
+#include&lt;QLineSeries&gt;
+#include&lt;QChartView&gt;
+#include&lt;QPushButton&gt;
+QT_CHARTS_USE_NAMESPACE
+widget::widget(QWidget *parent) : QWidget(parent)
+&#123;
+    &#x2F;&#x2F;load a csv file from the disk
+    QString name&#x3D;QFileDialog::getOpenFileName(NULL,&quot;Open File&quot;,&quot;&#x2F;home&quot;,&quot;Excel(*.csv)&quot;);
+    &#x2F;&#x2F;if(name&#x3D;&#x3D;&quot;&quot;)return;
+    QFile file(name);
+    if(!file.open(QIODevice::ReadOnly))
+        qDebug()&lt;&lt;&quot;OPEN FILE FAILED!&quot;;
+    QTextStream *out&#x3D;new QTextStream(&amp;file);
+    QStringList tempOption&#x3D;out-&gt;readAll().split(&#39;\n&#39;);
+    for(int i&#x3D;1;i&lt;tempOption.count();i++)
+    &#123;
+        n++;
+        QStringList tt&#x3D;tempOption.at(i-1).split(&quot;,&quot;);
+        int tmp&#x3D;tt.at(1).toInt();
+        p[i-1]&#x3D;tmp;
+    &#125;
 
+    &#x2F;&#x2F;design the box to get the beginning and ending week
+    QLabel*label&#x3D;new QLabel(&quot;Please input the beginning week:&quot;);
+    QLabel*labelbel&#x3D;new QLabel(&quot;Please input the ending week:&quot;);
+    spinbox&#x3D;new QSpinBox(this);
+    spinboxbox&#x3D;new QSpinBox(this);
+    QSlider*slider&#x3D;new QSlider(Qt::Horizontal,this);
+    QSlider*sliderder&#x3D;new QSlider(Qt::Horizontal,this);
+    spinbox-&gt;setRange(1,52);
+    spinboxbox-&gt;setRange(1,52);
+    slider-&gt;setRange(1,52);
+    sliderder-&gt;setRange(1,52);
+    QObject::connect(slider,&amp;QSlider::valueChanged,spinbox,&amp;QSpinBox::setValue);
+    void (QSpinBox:: *spinBoxSignal)(int)&#x3D;&amp;QSpinBox::valueChanged;
+    QObject::connect(spinbox,spinBoxSignal,slider,&amp;QSlider::setValue);
+    QObject::connect(sliderder,&amp;QSlider::valueChanged,spinboxbox,&amp;QSpinBox::setValue);
+    QObject::connect(spinboxbox,spinBoxSignal,sliderder,&amp;QSlider::setValue);
+    QVBoxLayout*layout&#x3D;new QVBoxLayout;
+    btn&#x3D;new QPushButton(&quot;I have entered the value!&quot;);
+    layout-&gt;addWidget(label);
+    layout-&gt;addWidget(spinbox);
+    layout-&gt;addWidget(slider);
+    layout-&gt;addWidget(labelbel);
+    layout-&gt;addWidget(spinboxbox);
+    layout-&gt;addWidget(sliderder);
+    layout-&gt;addWidget(btn);
+    this-&gt;setLayout(layout);
+    this-&gt;show();
+&#125;
+void widget::showline()
+&#123;
+    &#x2F;&#x2F;draw the chart based on the data
+    QLineSeries*line&#x3D;new QLineSeries();
+    line-&gt;setName(QString(&quot;POI&quot;));
+    line-&gt;setVisible(true);
+    line-&gt;setPointLabelsVisible(false);
+    line-&gt;setPointsVisible(true);
+    for(int i&#x3D;spinbox-&gt;value();i&lt;&#x3D;spinboxbox-&gt;value();i++)
+    &#123;
+        line-&gt;append(i,p[i]);
+    &#125;
+    QChart*chart&#x3D;new QChart();
+    chart-&gt;setAnimationOptions(QChart::AllAnimations);
+    chart-&gt;setLocalizeNumbers(true);
+    chart-&gt;addSeries(line);
+    chart-&gt;createDefaultAxes();
+    chart-&gt;setTitle(&quot;POI checking-in data&quot;);
+    chart-&gt;legend()-&gt;setVisible(true);
+    chart-&gt;legend()-&gt;setAlignment(Qt::AlignBottom);
+    chart-&gt;legend()-&gt;setBackgroundVisible(true);
+    chart-&gt;legend()-&gt;setLabelColor(QColor(255,128,255));
+    chart-&gt;legend()-&gt;setVisible(true);
+    QFont font &#x3D; chart-&gt;legend()-&gt;font();
+    QChartView*chartView&#x3D;new QChartView(chart);
+    chartView-&gt;setRenderHint(QPainter::Antialiasing);
+    chartView-&gt;resize(900,600);
+    chartView-&gt;show();
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<p>“小作业”艰难完成。</p>
 
                 
             </div>
